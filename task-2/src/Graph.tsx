@@ -48,17 +48,32 @@ class Graph extends Component<IProps, {}> {
     }
     if (this.table) {
       // Load the `table` in the `<perspective-viewer>` DOM reference.
-
-      // Add more Perspective configurations here.
       elem.load(this.table);
+
+      // y_line create a continuous line graph
+      elem.setAttribute('view', 'y_line');
+
+      // Distinguish stock ABC and DEF
+      elem.setAttribute('column-pivots', '["stock"]');
+
+      // Map each data point based on its timestamp
+      elem.setAttribute('row_pivots', '["timestamp"]');
+
+      // Focus on a particular part of a stock's data along the y-axis
+      elem.setAttribute('columns', '["top_ask_price"]');
+
+      // Handle duplicated data and consolidate it into a single data point
+      //  If a data point has a unique stock name and time stamp, average out the top bid price and top ask price of similar data points
+      elem.setAttribute(
+        'aggregates',
+        '{"stock":"distinct_count", "top_ask_price":"avg", "top_bid_price":"avg", "timestamp":"distinct_count"}'
+      );
     }
   }
 
   componentDidUpdate() {
     // Everytime the data props is updated, insert the data into Perspective table
     if (this.table) {
-      // As part of the task, you need to fix the way we update the data props to
-      // avoid inserting duplicated entries into Perspective table again.
       this.table.update(
         this.props.data.map((el: any) => {
           // Format the data from ServerRespond to the schema
