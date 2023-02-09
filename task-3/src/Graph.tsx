@@ -5,11 +5,11 @@ import { DataManipulator } from './DataManipulator';
 import './Graph.css';
 
 interface IProps {
-  data: ServerRespond[],
+  data: ServerRespond[];
 }
 
 interface PerspectiveViewerElement extends HTMLElement {
-  load: (table: Table) => void,
+  load: (table: Table) => void;
 }
 class Graph extends Component<IProps, {}> {
   table: Table | undefined;
@@ -20,13 +20,18 @@ class Graph extends Component<IProps, {}> {
 
   componentDidMount() {
     // Get element from the DOM.
-    const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+    const elem = (document.getElementsByTagName(
+      'perspective-viewer'
+    )[0] as unknown) as PerspectiveViewerElement;
 
     const schema = {
-      stock: 'string',
-      top_ask_price: 'float',
-      top_bid_price: 'float',
+      price_abc: 'float',
+      price_def: 'float',
+      ratio: 'float',
       timestamp: 'date',
+      upper_bound: 'float',
+      lower_bound: 'float',
+      trigger_alert: 'float',
     };
 
     if (window.perspective && window.perspective.worker()) {
@@ -39,20 +44,21 @@ class Graph extends Component<IProps, {}> {
       elem.setAttribute('column-pivots', '["stock"]');
       elem.setAttribute('row-pivots', '["timestamp"]');
       elem.setAttribute('columns', '["top_ask_price"]');
-      elem.setAttribute('aggregates', JSON.stringify({
-        stock: 'distinctcount',
-        top_ask_price: 'avg',
-        top_bid_price: 'avg',
-        timestamp: 'distinct count',
-      }));
+      elem.setAttribute(
+        'aggregates',
+        JSON.stringify({
+          stock: 'distinctcount',
+          top_ask_price: 'avg',
+          top_bid_price: 'avg',
+          timestamp: 'distinct count',
+        })
+      );
     }
   }
 
   componentDidUpdate() {
     if (this.table) {
-      this.table.update(
-        DataManipulator.generateRow(this.props.data),
-      );
+      this.table.update(DataManipulator.generateRow(this.props.data));
     }
   }
 }
