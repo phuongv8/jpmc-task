@@ -42,17 +42,20 @@ class Graph extends Component<IProps, {}> {
       elem.load(this.table);
       elem.setAttribute('view', 'y_line');
       elem.setAttribute('row-pivots', '["timestamp"]');
-      elem.setAttribute('columns', '["top_ask_price"]');
+      elem.setAttribute(
+        'columns',
+        '["ratio", "lower_bound", "upper_bound", "trigger_alert"]'
+      );
       elem.setAttribute(
         'aggregates',
         JSON.stringify({
           price_abc: 'avg',
           price_def: 'avg',
           ratio: 'avg',
+          timestamp: 'distinct count',
           upper_bound: 'avg',
           lower_bound: 'avg',
           trigger_alert: 'avg',
-          timestamp: 'distinct count',
         })
       );
     }
@@ -60,7 +63,9 @@ class Graph extends Component<IProps, {}> {
 
   componentDidUpdate() {
     if (this.table) {
-      this.table.update(DataManipulator.generateRow(this.props.data));
+      this.table.update(([
+        DataManipulator.generateRow(this.props.data),
+      ] as unknown) as TableData);
     }
   }
 }
